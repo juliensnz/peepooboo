@@ -129,9 +129,7 @@ const SleepEventListItem = ({event}: {event: Sleep}) => {
     <ListItem>
       <Time>
         <Day>{intlRelative.format(relativeDayStart, 'day')}</Day>
-        <Hour>
-          {event.start.toDate().getHours()}:{event.start.toDate().getMinutes()}
-        </Hour>
+        <Hour>{getStringTimeFromDate(event.start.toDate())}</Hour>
       </Time>
       <Time>
         <Day>Duration</Day>
@@ -152,7 +150,7 @@ const EventList = forwardRef(function EventList({type}: EventListProps, ref: For
     <Container>
       {data?.docs.length === 0 && <NoEvent>No event for now</NoEvent>}
       <ScrollContainer ref={ref}>
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {data?.docs.map(doc => {
             const event = doc.data() as Event;
 

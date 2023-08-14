@@ -94,7 +94,6 @@ const AddSleepForm = ({onAddEvent}: AddSleepFormProps) => {
             )}
           />
         </Timers>
-
         <Submit />
       </Form>
     </Container>

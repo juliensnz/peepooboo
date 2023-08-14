@@ -1,6 +1,7 @@
 'use client';
 
 import {AddChangeForm} from '@/app/(root)/components/AddChangeForm';
+import {AddEventButton} from '@/app/(root)/components/AddEventButton';
 import {EventList} from '@/app/(root)/components/EventList';
 import {useAddEvent} from '@/app/(root)/hooks/useEvents';
 import {Change} from '@/domain/model/Event';
@@ -12,6 +13,7 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 export default function Change() {
@@ -21,14 +23,16 @@ export default function Change() {
   return (
     <Container>
       <EventList ref={ref} type="change" />
-      <AddChangeForm
-        onAddEvent={event => {
-          (async () => {
-            ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});
-            addEvent(event as Change);
-          })();
-        }}
-      />
+      <AddEventButton>
+        <AddChangeForm
+          onAddEvent={event => {
+            (async () => {
+              ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});
+              addEvent(event as Change);
+            })();
+          }}
+        />
+      </AddEventButton>
     </Container>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import {AddEventButton} from '@/app/(root)/components/AddEventButton';
 import {AddSleepForm} from '@/app/(root)/components/AddSleepForm';
 import {EventList} from '@/app/(root)/components/EventList';
 import {useAddEvent} from '@/app/(root)/hooks/useEvents';
@@ -12,6 +13,7 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 export default function Sleep() {
@@ -21,14 +23,17 @@ export default function Sleep() {
   return (
     <Container>
       <EventList ref={ref} type="sleep" />
-      <AddSleepForm
-        onAddEvent={event => {
-          (async () => {
-            ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});
-            addEvent(event as Sleep);
-          })();
-        }}
-      />
+
+      <AddEventButton>
+        <AddSleepForm
+          onAddEvent={event => {
+            (async () => {
+              ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});
+              addEvent(event as Sleep);
+            })();
+          }}
+        />
+      </AddEventButton>
     </Container>
   );
 }
