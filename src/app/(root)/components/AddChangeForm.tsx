@@ -7,18 +7,32 @@ import {Timestamp} from '@firebase/firestore';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import styled from 'styled-components';
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-top: 0.5px solid #555;
+  flex: 1;
+  padding: 30px 0;
+  gap: 20px;
+`;
+
+const Title = styled.h1`
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+`;
+
 const Form = styled.form`
   display: flex;
   width: 100vw;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   gap: 1.5rem;
   align-self: center;
-  padding: 10px;
   background: black;
-  flex: 1;
-  border-top: 0.5px solid #555;
 `;
 
 const PeePoop = styled.div`
@@ -57,54 +71,59 @@ const AddChangeForm = ({onAddEvent}: AddChangeFormProps) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <Controller
-        control={control}
-        name="timestamp"
-        render={({field: {onChange, onBlur, value}}) => <TimeInput onChange={onChange} onBlur={onBlur} value={value} />}
-      />
-
-      <PeePoop>
+    <Container>
+      <Title>Log a new change</Title>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
-          name="pee"
+          name="timestamp"
           render={({field: {onChange, onBlur, value}}) => (
-            <CheckboxInput
-              onChange={value => {
-                onChange(value);
-                if (false === value) {
-                  setValue('poop', false);
-                }
-              }}
-              onBlur={onBlur}
-              value={value}
-              icon="1"
-            />
+            <TimeInput onChange={onChange} onBlur={onBlur} value={value} />
           )}
         />
-        {errors.pee && <span>This field is required</span>}
-        <Controller
-          control={control}
-          name="poop"
-          render={({field: {onChange, onBlur, value}}) => (
-            <CheckboxInput
-              onChange={value => {
-                onChange(value);
-                if (true === value) {
-                  setValue('pee', true);
-                }
-              }}
-              onBlur={onBlur}
-              value={value}
-              icon="2"
-            />
-          )}
-        />
-        {errors.poop && <span>This field is required</span>}
-      </PeePoop>
 
-      <Submit />
-    </Form>
+        <PeePoop>
+          <Controller
+            control={control}
+            name="pee"
+            render={({field: {onChange, onBlur, value}}) => (
+              <CheckboxInput
+                onChange={value => {
+                  onChange(value);
+                  if (false === value) {
+                    setValue('poop', false);
+                  }
+                }}
+                onBlur={onBlur}
+                value={value}
+                icon="1"
+              />
+            )}
+          />
+          {errors.pee && <span>This field is required</span>}
+          <Controller
+            control={control}
+            name="poop"
+            render={({field: {onChange, onBlur, value}}) => (
+              <CheckboxInput
+                onChange={value => {
+                  onChange(value);
+                  if (true === value) {
+                    setValue('pee', true);
+                  }
+                }}
+                onBlur={onBlur}
+                value={value}
+                icon="2"
+              />
+            )}
+          />
+          {errors.poop && <span>This field is required</span>}
+        </PeePoop>
+
+        <Submit />
+      </Form>
+    </Container>
   );
 };
 

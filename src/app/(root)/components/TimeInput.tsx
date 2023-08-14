@@ -11,14 +11,14 @@ const Container = styled.label`
 `;
 
 const Day = styled.div`
-  font-size: 1.5rem;
-  font-weight: 200;
   text-transform: capitalize;
+  padding-left: 5px;
 `;
 
 const Input = styled.input`
   font-size: 3rem;
-  font-weight: 200;
+  font-weight: 100;
+  font-variant-numeric: tabular-nums;
   border: none;
   border-bottom: 1px solid black;
   padding: 0;
@@ -26,6 +26,7 @@ const Input = styled.input`
   font-family: inherit;
   background-color: transparent;
   color: inherit;
+  border-bottom: 1px solid #ccc;
 
   &::-webkit-calendar-picker-indicator {
     background: none;

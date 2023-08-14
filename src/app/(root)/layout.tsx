@@ -16,6 +16,7 @@ const Container = styled.div`
 const Content = styled.div`
   overflow: hidden;
   color: white;
+  height: 100%;
 `;
 
 const Layout = ({children}: {children: ReactNode}) => {
