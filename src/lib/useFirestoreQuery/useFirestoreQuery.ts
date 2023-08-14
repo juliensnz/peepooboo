@@ -23,6 +23,7 @@ export function useFirestoreQuery<T = DocumentData, R = QuerySnapshot<T>>(
         unsubscribe = onSnapshot(
           res,
           {
+            // @ts-ignore
             includeMetadataChanges: options?.includeMetadataChanges,
           },
           (snapshot: QuerySnapshot<T>) => {
@@ -32,6 +33,7 @@ export function useFirestoreQuery<T = DocumentData, R = QuerySnapshot<T>>(
       });
       return unsubscribe;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [query, queryKey]
   );
 
@@ -44,6 +46,7 @@ export function useFirestoreQuery<T = DocumentData, R = QuerySnapshot<T>>(
       onlyOnce: !isSubscription,
       fetchFn: () =>
         resolveQuery(query).then(resolvedQuery => {
+          // @ts-ignore
           return getQuerySnapshot(resolvedQuery, options?.source);
         }),
     }

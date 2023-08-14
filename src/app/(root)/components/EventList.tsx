@@ -4,6 +4,7 @@ import {getStringTimeFromDate} from '@/app/(root)/components/TimeInput';
 import {useEvents} from '@/app/(root)/hooks/useEvents';
 import {BottleFeed, BreastFeed, Change, Event, Sleep} from '@/domain/model/Event';
 import {eventRepository} from '@/infrastructure/EventRepository';
+import {AnimatePresence, motion} from 'framer-motion';
 import Image from 'next/image';
 import {ForwardedRef, forwardRef} from 'react';
 import SwipeToDelete from 'react-swipe-to-delete-ios';
@@ -118,8 +119,10 @@ const BottleFeedEventListItem = ({event}: {event: BottleFeed}) => {
 const SleepEventListItem = ({event}: {event: Sleep}) => {
   const relativeDayStart = event.start.toDate().getDate() - new Date().getDate();
   const duration = Math.ceil(Math.abs(event.end.toMillis() - event.start.toMillis()) / 1000 / 60);
+  // @ts-ignore
   const formattedDuration = Intl.DurationFormat
-    ? new Intl.DurationFormat('fr', {style: 'narrow'}).format({minutes: duration}, 'minutes')
+    ? // @ts-ignore
+      new Intl.DurationFormat('fr', {style: 'narrow'}).format({minutes: duration}, 'minutes')
     : `${duration}min`;
 
   return (
@@ -149,40 +152,44 @@ const EventList = forwardRef(function EventList({type}: EventListProps, ref: For
     <Container>
       {data?.docs.length === 0 && <NoEvent>No event for now</NoEvent>}
       <ScrollContainer ref={ref}>
-        {data?.docs.map(doc => {
-          const event = doc.data() as Event;
+        <AnimatePresence>
+          {data?.docs.map(doc => {
+            const event = doc.data() as Event;
 
-          switch (event.type) {
-            case 'change':
-              return (
-                <SwipeToDelete
-                  key={event.id}
-                  height={100}
-                  onDelete={() => {
-                    eventRepository.deleteEvent(event.id);
-                  }}
-                >
-                  <ChangeEventListItem event={event} />
-                </SwipeToDelete>
-              );
-            case 'breast_feed':
-              return <BreastFeedEventListItem key={event.id} event={event} />;
-            case 'bottle_feed':
-              return <BottleFeedEventListItem key={event.id} event={event} />;
-            case 'sleep':
-              return (
-                <SwipeToDelete
-                  key={event.id}
-                  height={100}
-                  onDelete={() => {
-                    eventRepository.deleteEvent(event.id);
-                  }}
-                >
-                  <SleepEventListItem key={event.id} event={event} />
-                </SwipeToDelete>
-              );
-          }
-        })}
+            switch (event.type) {
+              case 'change':
+                return (
+                  <motion.div key={event.id} initial={{height: 0}} animate={{height: '100px'}} exit={{height: 0}}>
+                    <SwipeToDelete
+                      height={100}
+                      onDelete={() => {
+                        eventRepository.deleteEvent(event.id);
+                      }}
+                    >
+                      <ChangeEventListItem event={event} />
+                    </SwipeToDelete>
+                  </motion.div>
+                );
+              case 'breast_feed':
+                return <BreastFeedEventListItem key={event.id} event={event} />;
+              case 'bottle_feed':
+                return <BottleFeedEventListItem key={event.id} event={event} />;
+              case 'sleep':
+                return (
+                  <motion.div key={event.id} initial={{height: 0}} animate={{height: '100px'}} exit={{height: 0}}>
+                    <SwipeToDelete
+                      height={100}
+                      onDelete={() => {
+                        eventRepository.deleteEvent(event.id);
+                      }}
+                    >
+                      <SleepEventListItem key={event.id} event={event} />
+                    </SwipeToDelete>
+                  </motion.div>
+                );
+            }
+          })}
+        </AnimatePresence>
       </ScrollContainer>
     </Container>
   );
