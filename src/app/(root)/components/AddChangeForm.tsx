@@ -1,8 +1,7 @@
 import {CheckboxInput} from '@/app/(root)/components/CheckboxInput';
 import {Submit} from '@/app/(root)/components/Submit';
 import {TimeInput} from '@/app/(root)/components/TimeInput';
-import {Change} from '@/domain/model/Event';
-import {eventRepository} from '@/infrastructure/EventRepository';
+import {Event} from '@/domain/model/Event';
 import {Timestamp} from '@firebase/firestore';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import styled from 'styled-components';
@@ -16,6 +15,8 @@ const Container = styled.div`
   flex: 1;
   padding: 30px 0;
   gap: 20px;
+  backdrop-filter: blur(33px);
+  background-blend-mode: overlay;
 `;
 
 const Title = styled.h1`
@@ -32,7 +33,6 @@ const Form = styled.form`
   justify-content: center;
   gap: 1.5rem;
   align-self: center;
-  background: black;
 `;
 
 const PeePoop = styled.div`
@@ -49,7 +49,7 @@ type Inputs = {
 };
 
 type AddChangeFormProps = {
-  onAddEvent: (event: Change) => void;
+  onAddEvent: (event: Omit<Event, 'id'>) => void;
 };
 
 const AddChangeForm = ({onAddEvent}: AddChangeFormProps) => {
@@ -67,7 +67,9 @@ const AddChangeForm = ({onAddEvent}: AddChangeFormProps) => {
   });
 
   const onSubmit: SubmitHandler<Inputs> = async data => {
-    await eventRepository.addEvent({...data, type: 'change', timestamp: Timestamp.fromDate(data.timestamp)});
+    const event = {...data, type: 'change', timestamp: Timestamp.fromDate(data.timestamp)} as const;
+
+    onAddEvent(event);
   };
 
   return (

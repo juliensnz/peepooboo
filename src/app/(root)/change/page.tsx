@@ -2,7 +2,7 @@
 
 import {AddChangeForm} from '@/app/(root)/components/AddChangeForm';
 import {EventList} from '@/app/(root)/components/EventList';
-import {useStreamEvents} from '@/app/(root)/hooks/useEvents';
+import {useAddEvent} from '@/app/(root)/hooks/useEvents';
 import {Change} from '@/domain/model/Event';
 import {useRef} from 'react';
 import styled from 'styled-components';
@@ -15,17 +15,18 @@ const Container = styled.div`
 `;
 
 export default function Change() {
-  const [changeEvents, addEvent] = useStreamEvents<Change>('change');
+  const addEvent = useAddEvent<Change>('change');
   const ref = useRef<HTMLDivElement>(null);
 
   return (
     <Container>
-      <EventList ref={ref} events={changeEvents} />
+      <EventList ref={ref} type="change" />
       <AddChangeForm
         onAddEvent={event => {
-          addEvent(event);
-          console.log(ref.current);
-          ref.current?.scrollTo(0, 0);
+          (async () => {
+            ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});
+            addEvent(event as Change);
+          })();
         }}
       />
     </Container>

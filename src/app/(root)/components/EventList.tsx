@@ -1,6 +1,7 @@
 'use client';
 
 import {getStringTimeFromDate} from '@/app/(root)/components/TimeInput';
+import {useEvents} from '@/app/(root)/hooks/useEvents';
 import {BottleFeed, BreastFeed, Change, Event, Sleep} from '@/domain/model/Event';
 import {eventRepository} from '@/infrastructure/EventRepository';
 import Image from 'next/image';
@@ -8,7 +9,7 @@ import {ForwardedRef, forwardRef} from 'react';
 import SwipeToDelete from 'react-swipe-to-delete-ios';
 import styled from 'styled-components';
 
-const intl = new Intl.RelativeTimeFormat('fr', {numeric: 'auto'});
+const intlRelative = new Intl.RelativeTimeFormat('fr', {numeric: 'auto'});
 
 const Container = styled.div`
   height: 100%;
@@ -16,7 +17,6 @@ const Container = styled.div`
 `;
 
 const ScrollContainer = styled.div`
-  border-collapse: collapse;
   overflow: auto;
 `;
 
@@ -62,16 +62,16 @@ const Poo = styled.div`
 `;
 
 const NoEvent = styled.div`
-  height: 100vh;
+  height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
 `;
 
 const ChangeImage = styled(Image)<{active: boolean}>`
   opacity: ${({active}) => (active ? 1 : 0.2)};
 `;
-
-type EventListProps = {
-  events: Event[];
-};
 
 const ChangeEventListItem = ({event}: {event: Change}) => {
   const relativeDay = event.timestamp.toDate().getDate() - new Date().getDate();
@@ -79,7 +79,7 @@ const ChangeEventListItem = ({event}: {event: Change}) => {
   return (
     <ListItem>
       <Time>
-        <Day>{intl.format(relativeDay, 'day')}</Day>
+        <Day>{intlRelative.format(relativeDay, 'day')}</Day>
         <Hour>{getStringTimeFromDate(event.timestamp.toDate())}</Hour>
       </Time>
       <Pee>
@@ -96,7 +96,7 @@ const BreastFeedEventListItem = ({event}: {event: BreastFeed}) => {
 
   return (
     <ListItem>
-      <Day>{intl.format(relativeDay, 'day')}</Day>
+      <Day>{intlRelative.format(relativeDay, 'day')}</Day>
       <Hour>
         {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
       </Hour>
@@ -108,33 +108,50 @@ const BottleFeedEventListItem = ({event}: {event: BottleFeed}) => {
 
   return (
     <ListItem>
-      <Day>{intl.format(relativeDay, 'day')}</Day>
+      <Day>{intlRelative.format(relativeDay, 'day')}</Day>
       <Hour>
         {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
       </Hour>
     </ListItem>
   );
 };
-const SleepFeedEventListItem = ({event}: {event: Sleep}) => {
-  const relativeDay = event.timestamp.toDate().getDate() - new Date().getDate();
+const SleepEventListItem = ({event}: {event: Sleep}) => {
+  const relativeDayStart = event.start.toDate().getDate() - new Date().getDate();
+  const duration = Math.ceil(Math.abs(event.end.toMillis() - event.start.toMillis()) / 1000 / 60);
+  const formattedDuration = Intl.DurationFormat
+    ? new Intl.DurationFormat('fr', {style: 'narrow'}).format({minutes: duration}, 'minutes')
+    : `${duration}min`;
 
   return (
     <ListItem>
-      <Day>{intl.format(relativeDay, 'day')}</Day>
-      <Hour>
-        {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
-      </Hour>
+      <Time>
+        <Day>{intlRelative.format(relativeDayStart, 'day')}</Day>
+        <Hour>
+          {event.start.toDate().getHours()}:{event.start.toDate().getMinutes()}
+        </Hour>
+      </Time>
+      <Time>
+        <Day>Duration</Day>
+        <Hour>{formattedDuration}</Hour>
+      </Time>
     </ListItem>
   );
 };
 
-const EventList = forwardRef(function EventList({events}: EventListProps, ref: ForwardedRef<HTMLDivElement>) {
-  console.log('render EventList', events.length, events);
+type EventListProps = {
+  type: Event['type'];
+};
+
+const EventList = forwardRef(function EventList({type}: EventListProps, ref: ForwardedRef<HTMLDivElement>) {
+  const {data} = useEvents(type);
+
   return (
-    <Container ref={ref}>
-      {events.length === 0 && <NoEvent />}
-      <ScrollContainer>
-        {events.map((event, index) => {
+    <Container>
+      {data?.docs.length === 0 && <NoEvent>No event for now</NoEvent>}
+      <ScrollContainer ref={ref}>
+        {data?.docs.map(doc => {
+          const event = doc.data() as Event;
+
           switch (event.type) {
             case 'change':
               return (
@@ -153,7 +170,17 @@ const EventList = forwardRef(function EventList({events}: EventListProps, ref: F
             case 'bottle_feed':
               return <BottleFeedEventListItem key={event.id} event={event} />;
             case 'sleep':
-              return <SleepFeedEventListItem key={event.id} event={event} />;
+              return (
+                <SwipeToDelete
+                  key={event.id}
+                  height={100}
+                  onDelete={() => {
+                    eventRepository.deleteEvent(event.id);
+                  }}
+                >
+                  <SleepEventListItem key={event.id} event={event} />
+                </SwipeToDelete>
+              );
           }
         })}
       </ScrollContainer>

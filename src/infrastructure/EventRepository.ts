@@ -1,5 +1,6 @@
 import {Event} from '@/domain/model/Event';
-import {Result} from '@/domain/model/Result';
+import {Either, Result} from '@/domain/model/Result';
+import {RuntimeError} from '@/domain/model/RuntimeError';
 import {firebaseApp} from '@/lib/firebase';
 import {
   getFirestore,
@@ -18,12 +19,13 @@ import {v4 as uuidv4} from 'uuid';
 const db = getFirestore(firebaseApp);
 
 const eventRepositoryCreator = ({db}: {db: Firestore}) => ({
-  addEvent: async (event: Omit<Event, 'id'>) => {
+  addEvent: async (event: Omit<Event, 'id'>): Promise<Either<Event, RuntimeError>> => {
     try {
       const id = uuidv4();
-      await setDoc(doc(db, 'events', id), {...event, id});
+      const newEvent = {...event, id};
+      await setDoc(doc(db, 'events', id), newEvent);
 
-      return Result.Ok(event);
+      return Result.Ok(newEvent as Event);
     } catch (error) {
       return Result.Error({
         type: 'event_repository.add_event',
@@ -42,6 +44,19 @@ const eventRepositoryCreator = ({db}: {db: Firestore}) => ({
         type: 'event_repository.delete_event',
         message: 'Error deleteing event',
         payload: {eventId, error},
+      });
+    }
+  },
+  getRef: <T extends Event>(type: T['type']) => {
+    try {
+      const q = query(collection(db, 'events'), where('type', '==', type), orderBy('timestamp', 'desc'));
+
+      return Result.Ok(q);
+    } catch (error) {
+      return Result.Error({
+        type: 'event_repository.get_query',
+        message: 'Error query events',
+        payload: {error},
       });
     }
   },

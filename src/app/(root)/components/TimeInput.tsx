@@ -27,6 +27,7 @@ const Input = styled.input`
   background-color: transparent;
   color: inherit;
   border-bottom: 1px solid #ccc;
+  border-radius: 0;
 
   &::-webkit-calendar-picker-indicator {
     background: none;
@@ -54,7 +55,6 @@ const TimeInput = ({value, onChange, ...props}: TimeInputProps) => {
         type="time"
         {...props}
         value={getStringTimeFromDate(value)}
-        defaultValue={getStringTimeFromDate(value)}
         onChange={event => onChange(getDateFromStringTime(event.target.value))}
       />
     </Container>

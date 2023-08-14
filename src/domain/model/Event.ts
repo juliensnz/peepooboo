@@ -26,8 +26,9 @@ type BottleFeed = {
 type Sleep = {
   type: 'sleep';
   id: string;
+  start: Timestamp;
+  end: Timestamp;
   timestamp: Timestamp;
-  duration: number;
 };
 
 type Event = Change | BreastFeed | BottleFeed | Sleep;

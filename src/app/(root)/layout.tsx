@@ -1,8 +1,19 @@
 'use client';
 
 import styled from 'styled-components';
-import {ReactNode} from 'react';
+import {ReactNode, Suspense} from 'react';
 import {Menu} from '@/app/(root)/components/Menu';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
+import {Loader} from '@/app/(root)/components/Loader';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      suspense: true,
+    },
+  },
+});
 
 const Container = styled.div`
   width: 100vw;
@@ -21,10 +32,15 @@ const Content = styled.div`
 
 const Layout = ({children}: {children: ReactNode}) => {
   return (
-    <Container>
-      <Content>{children}</Content>
-      <Menu />
-    </Container>
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
+      <Container>
+        <Content>
+          <Suspense fallback={<Loader />}>{children}</Suspense>
+        </Content>
+        <Menu />
+      </Container>
+    </QueryClientProvider>
   );
 };
 
