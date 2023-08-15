@@ -1,9 +1,9 @@
 'use client';
 
-import {AddChangeForm} from '@/app/(root)/components/AddChangeForm';
-import {AddEventButton} from '@/app/(root)/components/AddEventButton';
+import {AddChangeEventForm} from '@/app/(root)/components/AddChangeEventForm';
+import {AddEventButton} from '@/app/(root)/components/common/AddEventButton';
 import {EventList} from '@/app/(root)/components/EventList';
-import {useAddEvent} from '@/app/(root)/hooks/useEvents';
+import {useAddEvent} from '@/app/(root)/components/hooks/useEvents';
 import {Change} from '@/domain/model/Event';
 import {useRef} from 'react';
 import styled from 'styled-components';
@@ -24,7 +24,7 @@ export default function Change() {
     <Container>
       <EventList ref={ref} type="change" />
       <AddEventButton>
-        <AddChangeForm
+        <AddChangeEventForm
           onAddEvent={event => {
             (async () => {
               ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});

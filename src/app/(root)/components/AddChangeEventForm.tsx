@@ -1,6 +1,7 @@
-import {CheckboxInput} from '@/app/(root)/components/CheckboxInput';
-import {Submit} from '@/app/(root)/components/Submit';
-import {TimeInput} from '@/app/(root)/components/TimeInput';
+import {useModalContext} from '@/app/(root)/components/context/ModalContext';
+import {CheckboxInput} from '@/app/(root)/components/field/CheckboxInput';
+import {Submit} from '@/app/(root)/components/field/Submit';
+import {TimeInput} from '@/app/(root)/components/field/TimeInput';
 import {Event} from '@/domain/model/Event';
 import {Timestamp} from '@firebase/firestore';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
@@ -46,11 +47,11 @@ type Inputs = {
   poop: boolean;
 };
 
-type AddChangeFormProps = {
+type AddChangeEventFormProps = {
   onAddEvent: (event: Omit<Event, 'id'>) => void;
 };
 
-const AddChangeForm = ({onAddEvent}: AddChangeFormProps) => {
+const AddChangeEventForm = ({onAddEvent}: AddChangeEventFormProps) => {
   const {
     handleSubmit,
     setValue,
@@ -64,10 +65,13 @@ const AddChangeForm = ({onAddEvent}: AddChangeFormProps) => {
     },
   });
 
+  const {closeModal} = useModalContext();
+
   const onSubmit: SubmitHandler<Inputs> = async data => {
     const event = {...data, type: 'change', timestamp: Timestamp.fromDate(data.timestamp)} as const;
 
     onAddEvent(event);
+    closeModal();
   };
 
   return (
@@ -127,4 +131,4 @@ const AddChangeForm = ({onAddEvent}: AddChangeFormProps) => {
   );
 };
 
-export {AddChangeForm};
+export {AddChangeEventForm};

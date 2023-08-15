@@ -1,6 +1,5 @@
 'use client';
 
-import {Loader} from '@/app/(root)/components/Loader';
 import styled from 'styled-components';
 
 const Container = styled.div`

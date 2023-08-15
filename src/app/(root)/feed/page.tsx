@@ -1,7 +1,7 @@
 'use client';
 
-import {AddChangeForm} from '@/app/(root)/components/AddChangeForm';
-import {AddEventButton} from '@/app/(root)/components/AddEventButton';
+import {AddChangeEventForm} from '@/app/(root)/components/AddChangeEventForm';
+import {AddEventButton} from '@/app/(root)/components/common/AddEventButton';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -17,7 +17,7 @@ export default function Feed() {
     <Container>
       Feed
       <AddEventButton>
-        <AddChangeForm onAddEvent={() => {}} />
+        <AddChangeEventForm onAddEvent={() => {}} />
       </AddEventButton>
     </Container>
   );

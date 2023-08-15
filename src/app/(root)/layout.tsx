@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 import {ReactNode} from 'react';
-import {Menu} from '@/app/(root)/components/Menu';
+import {Menu} from '@/app/(root)/components/common/Menu';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 

@@ -1,5 +1,5 @@
-import {Submit} from '@/app/(root)/components/Submit';
-import {TimeInput} from '@/app/(root)/components/TimeInput';
+import {Submit} from '@/app/(root)/components/field/Submit';
+import {TimeInput} from '@/app/(root)/components/field/TimeInput';
 import {Event} from '@/domain/model/Event';
 import {Timestamp} from '@firebase/firestore';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
@@ -45,11 +45,11 @@ type Inputs = {
   end: Date | null;
 };
 
-type AddSleepFormProps = {
+type AddSleepEventFormProps = {
   onAddEvent: (event: Omit<Event, 'id'>) => void;
 };
 
-const AddSleepForm = ({onAddEvent}: AddSleepFormProps) => {
+const AddSleepEventForm = ({onAddEvent}: AddSleepEventFormProps) => {
   const {
     handleSubmit,
     setValue,
@@ -100,4 +100,4 @@ const AddSleepForm = ({onAddEvent}: AddSleepFormProps) => {
   );
 };
 
-export {AddSleepForm};
+export {AddSleepEventForm};

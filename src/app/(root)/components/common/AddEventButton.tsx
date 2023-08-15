@@ -1,3 +1,6 @@
+'use client';
+
+import {ModalContext} from '@/app/(root)/components/context/ModalContext';
 import {motion} from 'framer-motion';
 import Image from 'next/image';
 import {useLayoutEffect, useRef, useState} from 'react';
@@ -75,7 +78,7 @@ const useHeight = (ref: React.RefObject<HTMLDivElement>) => {
 
   useLayoutEffect(() => {
     setTimeout(() => {
-      setWidth((ref.current?.offsetHeight ?? 0) - 61);
+      setWidth((ref.current?.offsetHeight ?? 0) - 60);
     }, 200);
   }, []);
 
@@ -107,12 +110,11 @@ const AddEventButton = ({children}: AddEventButtonProps) => {
   const [isOpen, setState] = useState(false);
   const formRef = useRef(null);
   const height = useHeight(formRef);
-  console.log(height);
 
   return (
     <Container custom={height} initial={false} animate={isOpen ? 'open' : 'closed'} variants={container}>
       <Form initial={false} animate={isOpen ? 'open' : 'closed'} variants={form} ref={formRef}>
-        {children}
+        <ModalContext.Provider value={{closeModal: () => setState(false)}}>{children}</ModalContext.Provider>
       </Form>
       <Button initial={false} onClick={() => setState(!isOpen)} animate={isOpen ? 'open' : 'closed'} variants={button}>
         <Image src="/icon/plus.svg" width={20} height={20} alt="plus" />

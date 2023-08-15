@@ -1,11 +1,11 @@
 'use client';
 
-import {getStringTimeFromDate} from '@/app/(root)/components/TimeInput';
-import {useEvents} from '@/app/(root)/hooks/useEvents';
-import {BottleFeed, BreastFeed, Change, Event, Sleep} from '@/domain/model/Event';
+import {ChangeEventListItem} from '@/app/(root)/change/components/ChangeEventListItem';
+import {useEvents} from '@/app/(root)/components/hooks/useEvents';
+import {SleepEventListItem} from '@/app/(root)/sleep/components/SleepEventListItem';
+import {BottleFeed, BreastFeed, Event} from '@/domain/model/Event';
 import {eventRepository} from '@/infrastructure/EventRepository';
 import {AnimatePresence, motion} from 'framer-motion';
-import Image from 'next/image';
 import {ForwardedRef, forwardRef} from 'react';
 import SwipeToDelete from 'react-swipe-to-delete-ios';
 import styled from 'styled-components';
@@ -49,19 +49,6 @@ const Hour = styled.div`
   font-variant-numeric: tabular-nums;
 `;
 
-const Pee = styled.div`
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-`;
-const Poo = styled.div`
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  height: 60px;
-`;
-
 const NoEvent = styled.div`
   height: 60vh;
   display: flex;
@@ -70,28 +57,6 @@ const NoEvent = styled.div`
   font-size: 2rem;
 `;
 
-const ChangeImage = styled(Image)<{active: boolean}>`
-  opacity: ${({active}) => (active ? 1 : 0.2)};
-`;
-
-const ChangeEventListItem = ({event}: {event: Change}) => {
-  const relativeDay = event.timestamp.toDate().getDate() - new Date().getDate();
-
-  return (
-    <ListItem>
-      <Time>
-        <Day>{intlRelative.format(relativeDay, 'day')}</Day>
-        <Hour>{getStringTimeFromDate(event.timestamp.toDate())}</Hour>
-      </Time>
-      <Pee>
-        <ChangeImage active={event.pee} src="/icon/1.svg" width={40} height={40} alt="pee" />
-      </Pee>
-      <Poo>
-        <ChangeImage active={event.poop} src="/icon/2.svg" width={40} height={40} alt="poop" />
-      </Poo>
-    </ListItem>
-  );
-};
 const BreastFeedEventListItem = ({event}: {event: BreastFeed}) => {
   const relativeDay = event.timestamp.toDate().getDate() - new Date().getDate();
 
@@ -113,28 +78,6 @@ const BottleFeedEventListItem = ({event}: {event: BottleFeed}) => {
       <Hour>
         {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
       </Hour>
-    </ListItem>
-  );
-};
-const SleepEventListItem = ({event}: {event: Sleep}) => {
-  const relativeDayStart = event.start.toDate().getDate() - new Date().getDate();
-  const duration = Math.ceil(Math.abs(event.end.toMillis() - event.start.toMillis()) / 1000 / 60);
-  // @ts-ignore
-  const formattedDuration = Intl.DurationFormat
-    ? // @ts-ignore
-      new Intl.DurationFormat('fr', {style: 'narrow'}).format({minutes: duration}, 'minutes')
-    : `${duration}min`;
-
-  return (
-    <ListItem>
-      <Time>
-        <Day>{intlRelative.format(relativeDayStart, 'day')}</Day>
-        <Hour>{getStringTimeFromDate(event.start.toDate())}</Hour>
-      </Time>
-      <Time>
-        <Day>Duration</Day>
-        <Hour>{formattedDuration}</Hour>
-      </Time>
     </ListItem>
   );
 };
@@ -193,4 +136,4 @@ const EventList = forwardRef(function EventList({type}: EventListProps, ref: For
   );
 });
 
-export {EventList};
+export {EventList, Time, Day, Hour, ListItem};
