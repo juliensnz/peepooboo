@@ -1,4 +1,5 @@
 import {ListItem, Day, Hour, Time} from '@/app/(root)/components/EventList';
+import {getStringTimeFromDate} from '@/app/(root)/components/field/TimeInput';
 import {BottleFeed, BreastFeed} from '@/domain/model/Event';
 import styled from 'styled-components';
 
@@ -16,9 +17,7 @@ const BreastFeedEventListItem = ({event}: {event: BreastFeed}) => {
     <ListItem>
       <Time>
         <Day>{intlRelative.format(relativeDay, 'day')}</Day>
-        <Hour>
-          {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
-        </Hour>
+        <Hour>{getStringTimeFromDate(event.timestamp.toDate())}</Hour>
       </Time>
       <Type>Breast</Type>
     </ListItem>
@@ -31,9 +30,7 @@ const BottleFeedEventListItem = ({event}: {event: BottleFeed}) => {
     <ListItem>
       <Time>
         <Day>{intlRelative.format(relativeDay, 'day')}</Day>
-        <Hour>
-          {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
-        </Hour>
+        <Hour>{getStringTimeFromDate(event.timestamp.toDate())}</Hour>
       </Time>
       <Type>Bottle</Type>
     </ListItem>
