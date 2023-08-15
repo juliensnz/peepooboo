@@ -1,5 +1,4 @@
 import {useModalContext} from '@/app/(root)/components/context/ModalContext';
-import {Submit} from '@/app/(root)/components/field/Submit';
 import {TimeInput} from '@/app/(root)/components/field/TimeInput';
 import {Event} from '@/domain/model/Event';
 import {Timestamp} from '@firebase/firestore';
@@ -13,7 +12,7 @@ const Container = styled.div`
   justify-content: center;
   border-top: 0.5px solid #555;
   flex: 1;
-  padding: 30px 0;
+  padding: 30px 0 5px 0;
   gap: 20px;
 `;
 
@@ -25,12 +24,19 @@ const Title = styled.h1`
 
 const Form = styled.form`
   display: flex;
+  gap: 15px;
   width: 100vw;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Fieldset = styled.div`
+  display: flex;
   flex-direction: row;
   align-items: flex-end;
   justify-content: center;
   gap: 1.5rem;
-  align-self: center;
 `;
 
 const Select = styled.select`
@@ -51,6 +57,18 @@ const Select = styled.select`
   border-radius: 0;
 `;
 
+const Submit = styled.input`
+  border: 1px solid #555;
+  border-radius: 25px;
+  height: 50px;
+  display: block;
+  background: transparent;
+  font-size: 1.5rem;
+  color: white;
+  padding: 5px 25px;
+  margin-top: 10px;
+`;
+
 type Inputs = {
   type: 'breast_feed' | 'bottle_feed';
   timestamp: Date;
@@ -64,7 +82,7 @@ const getMinuteLabel = (minutes: number) => {
   return Intl.DurationFormat
     ? // @ts-ignore
       new Intl.DurationFormat('fr', {style: 'narrow'}).format({minutes: minutes}, 'minutes')
-    : `${minutes} min`;
+    : `${minutes}min`;
 };
 
 const generateElements = (count: number) => Array.from({length: count}).map((_, index) => index);
@@ -80,6 +98,7 @@ const AddFeedEventForm = ({onAddEvent}: AddFeedEventFormProps) => {
     control,
     register,
     watch,
+    reset,
   } = useForm<Inputs>({
     defaultValues: {
       type: 'breast_feed',
@@ -96,6 +115,7 @@ const AddFeedEventForm = ({onAddEvent}: AddFeedEventFormProps) => {
     const event = {...data, timestamp: Timestamp.fromDate(data.timestamp)} as const;
 
     onAddEvent(event);
+    reset();
     closeModal();
   };
 
@@ -103,56 +123,58 @@ const AddFeedEventForm = ({onAddEvent}: AddFeedEventFormProps) => {
     <Container>
       <Title>Log a new Feed</Title>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <Controller
-          control={control}
-          name="timestamp"
-          render={({field: {onChange, onBlur, value}}) => (
-            <TimeInput onChange={onChange} onBlur={onBlur} value={value} />
-          )}
-        />
+        <Fieldset>
+          <Controller
+            control={control}
+            name="timestamp"
+            render={({field: {onChange, onBlur, value}}) => (
+              <TimeInput onChange={onChange} onBlur={onBlur} value={value} />
+            )}
+          />
 
-        <Select {...register('type')}>
-          <option value="breast_feed">Breast</option>
-          <option value="bottle_feed">Bottle</option>
-        </Select>
-
-        {watch('type') === 'breast_feed' && (
-          <>
-            <Select {...register('left')}>
-              {generateElements(30).map(index => {
-                return (
-                  <option key={index} value={index}>
-                    {getMinuteLabel(index)}
-                  </option>
-                );
-              })}
-            </Select>
-            <Select {...register('right')}>
-              {generateElements(30).map(index => {
-                return (
-                  <option key={index} value={index}>
-                    {getMinuteLabel(index)}
-                  </option>
-                );
-              })}
-            </Select>
-          </>
-        )}
-        {watch('type') === 'bottle_feed' && (
-          <Select {...register('volume')}>
-            {generateElements(30).map(index => {
-              const value = index * 10 + 10;
-
-              return (
-                <option key={index} value={value}>
-                  {value} ml
-                </option>
-              );
-            })}
+          <Select {...register('type')}>
+            <option value="breast_feed">Breast</option>
+            <option value="bottle_feed">Bottle</option>
           </Select>
-        )}
+        </Fieldset>
+        <Fieldset>
+          {watch('type') === 'breast_feed' && (
+            <>
+              <Select {...register('left')}>
+                {generateElements(30).map(index => {
+                  return (
+                    <option key={index} value={index}>
+                      {getMinuteLabel(index)}
+                    </option>
+                  );
+                })}
+              </Select>
+              <Select {...register('right')}>
+                {generateElements(30).map(index => {
+                  return (
+                    <option key={index} value={index}>
+                      {getMinuteLabel(index)}
+                    </option>
+                  );
+                })}
+              </Select>
+            </>
+          )}
+          {watch('type') === 'bottle_feed' && (
+            <Select {...register('volume')}>
+              {generateElements(30).map(index => {
+                const value = index * 10 + 10;
 
-        <Submit />
+                return (
+                  <option key={index} value={value}>
+                    {value} ml
+                  </option>
+                );
+              })}
+            </Select>
+          )}
+        </Fieldset>
+        <Submit type="submit" />
       </Form>
     </Container>
   );

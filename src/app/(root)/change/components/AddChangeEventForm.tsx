@@ -57,6 +57,7 @@ const AddChangeEventForm = ({onAddEvent}: AddChangeEventFormProps) => {
     setValue,
     formState: {errors},
     control,
+    reset,
   } = useForm<Inputs>({
     defaultValues: {
       timestamp: new Date(),
@@ -71,6 +72,7 @@ const AddChangeEventForm = ({onAddEvent}: AddChangeEventFormProps) => {
     const event = {...data, type: 'change', timestamp: Timestamp.fromDate(data.timestamp)} as const;
 
     onAddEvent(event);
+    reset();
     closeModal();
   };
 

@@ -1,3 +1,4 @@
+import {useModalContext} from '@/app/(root)/components/context/ModalContext';
 import {Submit} from '@/app/(root)/components/field/Submit';
 import {TimeInput} from '@/app/(root)/components/field/TimeInput';
 import {Event} from '@/domain/model/Event';
@@ -52,15 +53,16 @@ type AddSleepEventFormProps = {
 const AddSleepEventForm = ({onAddEvent}: AddSleepEventFormProps) => {
   const {
     handleSubmit,
-    setValue,
     formState: {errors},
     control,
+    reset,
   } = useForm<Inputs>({
     defaultValues: {
       start: null,
       end: null,
     },
   });
+  const {closeModal} = useModalContext();
 
   const onSubmit: SubmitHandler<Inputs> = async data => {
     const event = {
@@ -72,6 +74,8 @@ const AddSleepEventForm = ({onAddEvent}: AddSleepEventFormProps) => {
     } as const;
 
     onAddEvent(event);
+    reset();
+    closeModal();
   };
 
   return (
