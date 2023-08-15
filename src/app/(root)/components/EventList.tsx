@@ -2,15 +2,14 @@
 
 import {ChangeEventListItem} from '@/app/(root)/change/components/ChangeEventListItem';
 import {useEvents} from '@/app/(root)/components/hooks/useEvents';
+import {BreastFeedEventListItem, BottleFeedEventListItem} from '@/app/(root)/feed/components/FeedEventListItem';
 import {SleepEventListItem} from '@/app/(root)/sleep/components/SleepEventListItem';
-import {BottleFeed, BreastFeed, Event} from '@/domain/model/Event';
+import {Event} from '@/domain/model/Event';
 import {eventRepository} from '@/infrastructure/EventRepository';
 import {AnimatePresence, motion} from 'framer-motion';
-import {ForwardedRef, forwardRef} from 'react';
+import {forwardRef, ForwardedRef, ReactNode} from 'react';
 import SwipeToDelete from 'react-swipe-to-delete-ios';
 import styled from 'styled-components';
-
-const intlRelative = new Intl.RelativeTimeFormat('fr', {numeric: 'auto'});
 
 const Container = styled.div`
   height: 100%;
@@ -57,37 +56,22 @@ const NoEvent = styled.div`
   font-size: 2rem;
 `;
 
-const BreastFeedEventListItem = ({event}: {event: BreastFeed}) => {
-  const relativeDay = event.timestamp.toDate().getDate() - new Date().getDate();
-
+const ListItemContainer = ({children, onDelete}: {children: ReactNode; onDelete: () => void}) => {
   return (
-    <ListItem>
-      <Day>{intlRelative.format(relativeDay, 'day')}</Day>
-      <Hour>
-        {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
-      </Hour>
-    </ListItem>
-  );
-};
-const BottleFeedEventListItem = ({event}: {event: BottleFeed}) => {
-  const relativeDay = event.timestamp.toDate().getDate() - new Date().getDate();
-
-  return (
-    <ListItem>
-      <Day>{intlRelative.format(relativeDay, 'day')}</Day>
-      <Hour>
-        {event.timestamp.toDate().getHours()}:{event.timestamp.toDate().getMinutes()}
-      </Hour>
-    </ListItem>
+    <motion.div initial={{height: 0}} animate={{height: '100px'}} exit={{height: 0}}>
+      <SwipeToDelete height={100} onDelete={onDelete}>
+        {children}
+      </SwipeToDelete>
+    </motion.div>
   );
 };
 
 type EventListProps = {
-  type: Event['type'];
+  types: Event['type'][];
 };
 
-const EventList = forwardRef(function EventList({type}: EventListProps, ref: ForwardedRef<HTMLDivElement>) {
-  const {data} = useEvents(type);
+const EventList = forwardRef(function EventList({types}: EventListProps, ref: ForwardedRef<HTMLDivElement>) {
+  const {data} = useEvents(types);
 
   return (
     <Container>
@@ -96,37 +80,34 @@ const EventList = forwardRef(function EventList({type}: EventListProps, ref: For
         <AnimatePresence initial={false}>
           {data?.docs.map(doc => {
             const event = doc.data() as Event;
+            const handleDelete = () => {
+              eventRepository.deleteEvent(event.id);
+            };
 
             switch (event.type) {
               case 'change':
                 return (
-                  <motion.div key={event.id} initial={{height: 0}} animate={{height: '100px'}} exit={{height: 0}}>
-                    <SwipeToDelete
-                      height={100}
-                      onDelete={() => {
-                        eventRepository.deleteEvent(event.id);
-                      }}
-                    >
-                      <ChangeEventListItem event={event} />
-                    </SwipeToDelete>
-                  </motion.div>
+                  <ListItemContainer key={event.id} onDelete={handleDelete}>
+                    <ChangeEventListItem event={event} />
+                  </ListItemContainer>
                 );
               case 'breast_feed':
-                return <BreastFeedEventListItem key={event.id} event={event} />;
+                return (
+                  <ListItemContainer key={event.id} onDelete={handleDelete}>
+                    <BreastFeedEventListItem key={event.id} event={event} />
+                  </ListItemContainer>
+                );
               case 'bottle_feed':
-                return <BottleFeedEventListItem key={event.id} event={event} />;
+                return (
+                  <ListItemContainer key={event.id} onDelete={handleDelete}>
+                    <BottleFeedEventListItem key={event.id} event={event} />
+                  </ListItemContainer>
+                );
               case 'sleep':
                 return (
-                  <motion.div key={event.id} initial={{height: 0}} animate={{height: '100px'}} exit={{height: 0}}>
-                    <SwipeToDelete
-                      height={100}
-                      onDelete={() => {
-                        eventRepository.deleteEvent(event.id);
-                      }}
-                    >
-                      <SleepEventListItem key={event.id} event={event} />
-                    </SwipeToDelete>
-                  </motion.div>
+                  <ListItemContainer key={event.id} onDelete={handleDelete}>
+                    <SleepEventListItem key={event.id} event={event} />
+                  </ListItemContainer>
                 );
             }
           })}

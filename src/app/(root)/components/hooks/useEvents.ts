@@ -3,17 +3,17 @@ import {eventRepository} from '@/infrastructure/EventRepository';
 import {useFirestoreQuery} from '@/lib/useFirestoreQuery/useFirestoreQuery';
 import {useCallback} from 'react';
 
-const useEvents = <T extends Event>(type: T['type']) => {
-  const ref = eventRepository.getRef<T>(type);
+const useEvents = <T extends Event>(types: T['type'][]) => {
+  const ref = eventRepository.getRef<T>(types);
 
   if (ref.isError()) throw ref.getError();
 
-  const query = useFirestoreQuery(['events', type], ref.get(), {subscribe: true});
+  const query = useFirestoreQuery(['events', ...types], ref.get(), {subscribe: true});
 
   return query;
 };
 
-const useAddEvent = <T extends Event>(type: T['type']) => {
+const useAddEvent = <T extends Event>() => {
   return useCallback(async (event: Omit<T, 'id'>): Promise<Event> => {
     const result = await eventRepository.addEvent(event);
 

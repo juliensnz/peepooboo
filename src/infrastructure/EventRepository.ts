@@ -1,6 +1,7 @@
 import {Event} from '@/domain/model/Event';
 import {Either, Result} from '@/domain/model/Result';
 import {RuntimeError} from '@/domain/model/RuntimeError';
+import {isString} from '@/domain/model/utils';
 import {firebaseApp} from '@/lib/firebase';
 import {
   getFirestore,
@@ -47,9 +48,13 @@ const eventRepositoryCreator = ({db}: {db: Firestore}) => ({
       });
     }
   },
-  getRef: <T extends Event>(type: T['type']) => {
+  getRef: <T extends Event>(type: T['type'] | T['type'][]) => {
     try {
-      const q = query(collection(db, 'events'), where('type', '==', type), orderBy('timestamp', 'desc'));
+      const q = query(
+        collection(db, 'events'),
+        where('type', isString(type) ? '==' : 'in', type),
+        orderBy('timestamp', 'desc')
+      );
 
       return Result.Ok(q);
     } catch (error) {

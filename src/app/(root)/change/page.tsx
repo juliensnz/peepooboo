@@ -1,28 +1,20 @@
 'use client';
 
-import {AddChangeEventForm} from '@/app/(root)/components/AddChangeEventForm';
+import {AddChangeEventForm} from '@/app/(root)/change/components/AddChangeEventForm';
 import {AddEventButton} from '@/app/(root)/components/common/AddEventButton';
+import {PageContainer} from '@/app/(root)/components/common/PageContainer';
 import {EventList} from '@/app/(root)/components/EventList';
 import {useAddEvent} from '@/app/(root)/components/hooks/useEvents';
 import {Change} from '@/domain/model/Event';
 import {useRef} from 'react';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  width: 100vw;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-`;
 
 export default function Change() {
-  const addEvent = useAddEvent<Change>('change');
+  const addEvent = useAddEvent<Change>();
   const ref = useRef<HTMLDivElement>(null);
 
   return (
-    <Container>
-      <EventList ref={ref} type="change" />
+    <PageContainer>
+      <EventList ref={ref} types={['change']} />
       <AddEventButton>
         <AddChangeEventForm
           onAddEvent={event => {
@@ -33,6 +25,6 @@ export default function Change() {
           }}
         />
       </AddEventButton>
-    </Container>
+    </PageContainer>
   );
 }

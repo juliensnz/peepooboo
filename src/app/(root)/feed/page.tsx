@@ -1,24 +1,30 @@
 'use client';
 
-import {AddChangeEventForm} from '@/app/(root)/components/AddChangeEventForm';
+import {EventList} from '@/app/(root)/components/EventList';
 import {AddEventButton} from '@/app/(root)/components/common/AddEventButton';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  width: 100vw;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-`;
+import {PageContainer} from '@/app/(root)/components/common/PageContainer';
+import {useAddEvent} from '@/app/(root)/components/hooks/useEvents';
+import {AddFeedEventForm} from '@/app/(root)/feed/components/AddFeedEventForm';
+import {BottleFeed, BreastFeed} from '@/domain/model/Event';
+import {useRef} from 'react';
 
 export default function Feed() {
+  const addEvent = useAddEvent<BreastFeed | BottleFeed>();
+  const ref = useRef<HTMLDivElement>(null);
+
   return (
-    <Container>
-      Feed
+    <PageContainer>
+      <EventList ref={ref} types={['breast_feed', 'bottle_feed']} />
       <AddEventButton>
-        <AddChangeEventForm onAddEvent={() => {}} />
+        <AddFeedEventForm
+          onAddEvent={event => {
+            (async () => {
+              ref.current?.parentElement?.scrollTo({top: 0, behavior: 'smooth'});
+              addEvent(event as BreastFeed);
+            })();
+          }}
+        />
       </AddEventButton>
-    </Container>
+    </PageContainer>
   );
 }

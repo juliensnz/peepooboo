@@ -12,8 +12,8 @@ type BreastFeed = {
   type: 'breast_feed';
   id: string;
   timestamp: Timestamp;
-  boob: 'left' | 'right';
-  duration: number;
+  left: number;
+  right: number;
 };
 
 type BottleFeed = {

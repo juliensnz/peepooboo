@@ -6,23 +6,15 @@ import {EventList} from '@/app/(root)/components/EventList';
 import {useAddEvent} from '@/app/(root)/components/hooks/useEvents';
 import {Sleep} from '@/domain/model/Event';
 import {useRef} from 'react';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  width: 100vw;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-`;
+import {PageContainer} from '@/app/(root)/components/common/PageContainer';
 
 export default function Sleep() {
-  const addEvent = useAddEvent<Sleep>('sleep');
+  const addEvent = useAddEvent<Sleep>();
   const ref = useRef<HTMLDivElement>(null);
 
   return (
-    <Container>
-      <EventList ref={ref} type="sleep" />
+    <PageContainer>
+      <EventList ref={ref} types={['sleep']} />
 
       <AddEventButton>
         <AddSleepEventForm
@@ -34,6 +26,6 @@ export default function Sleep() {
           }}
         />
       </AddEventButton>
-    </Container>
+    </PageContainer>
   );
 }
