@@ -80,7 +80,7 @@ const useHeight = (ref: React.RefObject<HTMLDivElement>) => {
     setTimeout(() => {
       setWidth((ref.current?.offsetHeight ?? 0) - 60);
     }, 200);
-  }, []);
+  }, [ref]);
 
   return height;
 };
